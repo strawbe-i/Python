@@ -7,6 +7,8 @@ from tkinter import *
 #Every turn each house makes you 3 dollars
 #The goal is to have as much money as possible at the end of the 10 turns
 
+#Updated gui
+
 #Function to clear window
 def clear(root):
     for widget in root.winfo_children():
@@ -41,6 +43,8 @@ def createGame(root):
 #Clicks on default or custom button
 def dcClicked(clicked, root):
     clear(root)
+    global houseEntry
+    houseEntry = ""
 
     if clicked == "Default":
         #Sets rules for a default game
@@ -49,17 +53,19 @@ def dcClicked(clicked, root):
         global money
         global houseRevenue
         global houseCost
+        global badTurn
         turns = 10
         money = 10
         houses = 0
         houseCost = 5
         houseRevenue = 3
+        badTurn = False
 
         beginspace0 = Label(root, text="")
         beginspace0.pack()
 
         #Start Button to go to play()
-        begin0 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue))
+        begin0 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn))
         begin0.pack()
 
         #Makes turnNumber variable globally
@@ -122,11 +128,11 @@ def dcClicked(clicked, root):
         houserevenueL.grid(row=5, column=2)
 
         #confirm button
-        customconfirm = Button(root, text="Use these settings", command=lambda: customconfirmClick(root, turnsE, starthousesE, startmoneyE, houserevenueE, housecostE))
+        customconfirm = Button(root, text="Use these settings", command=lambda: customconfirmClick(root, turnsE, starthousesE, startmoneyE, houserevenueE, housecostE, houseEntry))
         customconfirm.grid(row=5, column=4, columnspan=2)
 
 #Verify everything inputed in custom setup works
-def customconfirmClick(root, t, h, m, hr, hc):
+def customconfirmClick(root, t, h, m, hr, hc, he):
     #Makes important variables globally and grabs info
     global turns
     global houses
@@ -158,10 +164,10 @@ def customconfirmClick(root, t, h, m, hr, hc):
         ok.pack()
         badInput = True
     if badInput != True:
-        #badInput is set to true if the input ais bad. If it's good, it allows them to click start to go to play()
+        #badInput is set to true if the input is bad. If it's good, it allows them to click start to go to play()
         beginspace1 = Label(root, text="")
         beginspace1.pack()
-        begin1 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue))
+        begin1 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, he, badTurn))
         begin1.pack()
         global turnNumber
         turnNumber = 0
@@ -169,56 +175,53 @@ def customconfirmClick(root, t, h, m, hr, hc):
         badTurn = False
 
 #Play the game
-def play(root, turnNumber, turns, money, houses, houseCost, houseRevenue):
-    #Increase turnNumber by 1, give them information and ask how many houses to buy with and entry field. Sent to doTurn() when button is clicked
-    turnNumber += 1
-    clear(root)
-    print("turns", turns, "money", money, "houses", houses, "houseCost", houseCost, "houseRevenue", houseRevenue)
-    turnDisp = Label(root, text="\nTurn " + str(turnNumber) + "\n\nYou currently have " + str(money) + " dollars and " + str(houses) + " houses\n")
-    turnDisp.pack()
-    houseEntry = Entry(root)
-    houseEntry.focus_set()
-    houseEntry.pack()
-    purchase = Button(root, text="Buy Houses", command=lambda: doTurn(root, turnNumber, houseEntry, turns, money, houses, houseCost, houseRevenue))
-    purchase.pack()
-
-#Does the turn
-def doTurn(root, turnNumber, he, turns, money, houses, houseCost, houseRevenue):
-    #Makes sure users input is a number that that is at least 0 and that the cost of buying the houses isn't more than they can afford
-    try:
-        newHouses = int(he.get())
-        price = newHouses*houseCost
-        if price > money:
-            #Text to appear if it costs too much, disappears after 3 seconds
-            tooMuch = Label(root, text="That would cost " + str(price) + " dollars but you only have " + str(money))
-            tooMuch.pack()
-            root.after(3000, destroy, tooMuch)
-        elif price < 0:
-            #Text to appear if they put less than 0, disappears after 3 seconds
-            zero = Label(root, text="Please put 0 or more")
-            zero.pack()
-            root.after(3000, destroy, zero)
-        else:
-            #Input was good, updates houses and money and depending on turn does the next step
-            clear(root)
-            houses += newHouses
-            money = money - price
-            money += houses*houseRevenue
-            turnSummary = Label(root, text="\nYou bought " + str(newHouses) + " houses for " + str(price) + " dollars\nYou've made " + str(houses*houseRevenue) + " dollars this turn leaving you with a total of " + str(money) + " dollars\n\n")
-            turnSummary.pack()
-            if turnNumber != turns:
-                #If the total number of turns isn't over, this goes to play() to do another turn
-                next = Button(root, text="Next Turn", command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue))
-                next.pack()
+def play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn):
+    if turnNumber != 0:
+        try:
+            newHouses = int(houseEntry.get())
+            price = newHouses*houseCost
+            if price > money:
+                #Text to appear if it costs too much, disappears after 3 seconds, sets badTurn to true
+                tooMuch = Label(root, text="That would cost $" + str(price) + " but you only have $" + str(money))
+                tooMuch.pack()
+                root.after(3000, destroy, tooMuch)
+                badTurn = True
+            elif price < 0:
+                #Text to appear if they put less than 0, disappears after 3 seconds, sets badTurn to true
+                zero = Label(root, text="Please put 0 or more")
+                zero.pack()
+                root.after(3000, destroy, zero)
+                badTurn = True
             else:
-                #If the total number of turns has been met, it shows a button say finish instead and takes them to endGame()
-                finish = Button(root, text="Finish", command=lambda: endGame(root, turns, money, houses))
-                finish.pack()
-    except ValueError:
-        #Text to appear if input is not a number, disappears after 3 seconds
-        invalid = Label(root, text="Not a number")
-        invalid.pack()
-        root.after(3000, destroy, invalid)
+                #Input was good, updates houses and money and depending on turn does the next step
+                houses += newHouses
+                money = money - price
+                money += houses*houseRevenue
+                badTurn = False
+        except ValueError:
+            #Text to appear if input is not a number, disappears after 3 seconds, sets badTurn to true
+            invalid = Label(root, text="Not a number")
+            invalid.pack()
+            root.after(3000, destroy, invalid)
+            badTurn = True
+    #If it's a good turn increase turnNumber by 1, give them information and ask how many houses to buy with and entry field. Sent to doTurn() when button is clicked
+    if badTurn != True:
+        turnNumber += 1
+        clear(root)
+        print("turns", turns, "money", money, "houses", houses, "houseCost", houseCost, "houseRevenue", houseRevenue)
+        turnDisp = Label(root, text="Turn " + str(turnNumber) + "               \n\n$" + str(money) + "               \n\n" + str(houses) + " houses               \n")
+        turnDisp.pack(side="right")
+        hespace = Label(root, text="\n\n\n\n")
+        hespace.pack()
+        houseEntry = Entry(root)
+        houseEntry.focus_set()
+        houseEntry.pack()
+        if turnNumber != turns:
+            purchase = Button(root, text="Buy Houses", command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn))
+            purchase.pack()
+        else:
+            lastPurchase = Button(root, text="Buy Houses\nand Finish", command=lambda: endGame(root, turns, money, houses))
+            lastPurchase.pack()
 
 #Shows results and asks to play again
 def endGame(root, turns, money, houses):
