@@ -220,19 +220,47 @@ def play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseE
             purchase = Button(root, text="Buy Houses", command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn))
             purchase.pack()
         else:
-            lastPurchase = Button(root, text="Buy Houses\nand Finish", command=lambda: endGame(root, turns, money, houses))
+            lastPurchase = Button(root, text="Buy Houses\nand Finish", command=lambda: endGame(root, turns, money, houses, houseEntry, houseCost, houseRevenue, badTurn))
             lastPurchase.pack()
 
 #Shows results and asks to play again
-def endGame(root, turns, money, houses):
-    clear(root)
-    results = Label(root, text="\nYou've Completed The Game\nYou ended with " + str(money) + " dollars!\nYou also had " + str(houses) + " houses\n")
-    results.pack()
-    #First button goes to createGame(), other button goes to end()
-    again = Button(root, text="Play Again", width=8, command=lambda: createGame(root))
-    again.pack()
-    quit = Button(root, text="Quit", width=7, command=lambda: end(root))
-    quit.pack()
+def endGame(root, turns, money, houses, houseEntry, houseCost, houseRevenue, badTurn):
+    try:
+        newHouses = int(houseEntry.get())
+        price = newHouses*houseCost
+        if price > money:
+            #Text to appear if it costs too much, disappears after 3 seconds, sets badTurn to true
+            tooMuch = Label(root, text="That would cost $" + str(price) + " but you only have $" + str(money))
+            tooMuch.pack()
+            root.after(3000, destroy, tooMuch)
+            badTurn = True
+        elif price < 0:
+            #Text to appear if they put less than 0, disappears after 3 seconds, sets badTurn to true
+            zero = Label(root, text="Please put 0 or more")
+            zero.pack()
+            root.after(3000, destroy, zero)
+            badTurn = True
+        else:
+            #Input was good, updates houses and money and depending on turn does the next step
+            houses += newHouses
+            money = money - price
+            money += houses*houseRevenue
+            badTurn = False
+    except ValueError:
+        #Text to appear if input is not a number, disappears after 3 seconds, sets badTurn to true
+        invalid = Label(root, text="Not a number")
+        invalid.pack()
+        root.after(3000, destroy, invalid)
+        badTurn = True
+    if badTurn != True:
+        clear(root)
+        results = Label(root, text="\nYou've Completed The Game\nYou ended with " + str(money) + " dollars!\nYou also had " + str(houses) + " houses\n")
+        results.pack()
+        #First button goes to createGame(), other button goes to end()
+        again = Button(root, text="Play Again", width=8, command=lambda: createGame(root))
+        again.pack()
+        quit = Button(root, text="Quit", width=7, command=lambda: end(root))
+        quit.pack()
 
 #Makes window
 root = Tk()
