@@ -1,5 +1,4 @@
 from tkinter import *
-from PIL import ImageTk, Image
 
 #House Game
 #There are 10 turns
@@ -25,17 +24,17 @@ def createGame():
 
     #start0 is the welcome and rules text, start1 asks how they'd like to play
     clear(root)
-    start0 = Label(root, text="Welcome to the House Game!\nThere are 10 turns\nYou'll start with 10 dollars\nEach turn you can buy as many houses as you want at 5 dollars each\nEvery turn each houses you own makes you 3 dollars\nThe goal is to have as much money as possible at the end of the game")
+    start0 = Label(root, text="Welcome to the House Game!\nThere are 10 turns\nYou'll start with 10 dollars\nEach turn you can buy as many houses as you want at 5 dollars each\nEvery turn each house you own makes you 3 dollars\nThe goal is to have as much money as possible at the end of the game")
     start0.pack()
     start1 = Label(root, text="Would you like to play with these default rules or make custom rules?", height=2)
     start1.pack()
 
     #Default and Custom buttons
-    default = Button(root, text="Default", width = 7, command=lambda: dcClicked("Default"))
+    default = Button(root, text="Default", width=7, command=lambda: dcClicked("Default"))
     default.pack()
     defcusspacer = Label(root, text="")
     defcusspacer.pack()
-    custom = Button(root, text="Custom", width = 7, command=lambda: dcClicked("Custom"))
+    custom = Button(root, text="Custom", width=7, command=lambda: dcClicked("Custom"))
     custom.pack()
 
 #Clicks on default or custom button
@@ -84,7 +83,7 @@ def dcClicked(clicked):
         turnsE = Entry(root)
         turnsE.insert(0, 10)
         turnsE.grid(row=1, column=1)
-        turnsL = Label(root, text="Turns", width = 12)
+        turnsL = Label(root, text="Turns", width=12)
         turnsL.grid(row=1, column=2)
 
         space1 = Label(root, text="                  ")
@@ -95,7 +94,7 @@ def dcClicked(clicked):
         startmoneyE = Entry(root)
         startmoneyE.insert(0, 10)
         startmoneyE.grid(row=1, column=4)
-        startmoneyL = Label(root, text="Starting Money", width = 15)
+        startmoneyL = Label(root, text="Starting Money", width=15)
         startmoneyL.grid(row=1, column=5)
 
         space2 = Label(root, text="    ")
