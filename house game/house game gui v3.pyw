@@ -20,7 +20,8 @@ def destroy(widget):
     widget.destroy()
 
 #Starts new game
-def createGame(root):
+def createGame():
+    global root
 
     #start0 is the welcome and rules text, start1 asks how they'd like to play
     clear(root)
@@ -30,15 +31,16 @@ def createGame(root):
     start1.pack()
 
     #Default and Custom buttons
-    default = Button(root, text="Default", width = 7, command=lambda: dcClicked("Default", root))
+    default = Button(root, text="Default", width = 7, command=lambda: dcClicked("Default"))
     default.pack()
     defcusspacer = Label(root, text="")
     defcusspacer.pack()
-    custom = Button(root, text="Custom", width = 7, command=lambda: dcClicked("Custom", root))
+    custom = Button(root, text="Custom", width = 7, command=lambda: dcClicked("Custom"))
     custom.pack()
 
 #Clicks on default or custom button
-def dcClicked(clicked, root):
+def dcClicked(clicked):
+    global root
     clear(root)
     global houseEntry
     houseEntry = ""
@@ -62,7 +64,7 @@ def dcClicked(clicked, root):
         beginspace0.pack()
 
         #Start Button to go to play()
-        begin0 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn))
+        begin0 = Button(root, text="Start", width=15, height=5, command=play)
         begin0.pack()
 
         #Makes turnNumber variable globally
@@ -78,6 +80,7 @@ def dcClicked(clicked, root):
 
         #Make an entry and label for every rule in the game, then confirmation button that goes to customconfirmClicked() with necessary variables
         #turns
+        global turnsE
         turnsE = Entry(root)
         turnsE.insert(0, 10)
         turnsE.grid(row=1, column=1)
@@ -88,6 +91,7 @@ def dcClicked(clicked, root):
         space1.grid(row=1, column=3)
 
         #starting money
+        global startmoneyE
         startmoneyE = Entry(root)
         startmoneyE.insert(0, 10)
         startmoneyE.grid(row=1, column=4)
@@ -98,6 +102,7 @@ def dcClicked(clicked, root):
         space2.grid(row=2, column=0)
 
         #house cost
+        global housecostE
         housecostE = Entry(root)
         housecostE.insert(0, 5)
         housecostE.grid(row=3, column=1)
@@ -108,6 +113,7 @@ def dcClicked(clicked, root):
         space3.grid(row=3, column=3)
 
         #starting houses
+        global starthousesE
         starthousesE = Entry(root)
         starthousesE.insert(0, 0)
         starthousesE.grid(row=3, column=4)
@@ -118,6 +124,7 @@ def dcClicked(clicked, root):
         space4.grid(row=4, column=0)
 
         #house revenue
+        global houserevenueE
         houserevenueE = Entry(root)
         houserevenueE.insert(0, 3)
         houserevenueE.grid(row=5, column=1)
@@ -125,22 +132,28 @@ def dcClicked(clicked, root):
         houserevenueL.grid(row=5, column=2)
 
         #confirm button
-        customconfirm = Button(root, text="Use these settings", command=lambda: customconfirmClick(root, turnsE, starthousesE, startmoneyE, houserevenueE, housecostE, houseEntry))
+        customconfirm = Button(root, text="Use these settings", command=customconfirmClick)
         customconfirm.grid(row=5, column=4, columnspan=2)
 
 #Verify everything inputed in custom setup works
-def customconfirmClick(root, t, h, m, hr, hc, he):
+def customconfirmClick():
     #Makes important variables globally and grabs info
+    global root
+    global turnsE
     global turns
+    global starthousesE
     global houses
+    global startmoneyE
     global money
+    global houserevenueE
     global houseRevenue
+    global housecostE
     global houseCost
-    turns = t.get()
-    houses = h.get()
-    money = m.get()
-    houseRevenue = hr.get()
-    houseCost = hc.get()
+    turns = turnsE.get()
+    houses = starthousesE.get()
+    money = startmoneyE.get()
+    houseRevenue = houserevenueE.get()
+    houseCost = housecostE.get()
     clear(root)
     #Tries to turn inputs to variables. If it fails it makes the user retry, or if any numbers are negative or turn is 0
     try:
@@ -157,14 +170,14 @@ def customconfirmClick(root, t, h, m, hr, hc, he):
         print("One or more invalid inputs")
         error = Label(root, text="\nOne or more invalid inputs. Turns must be at least 1 and the rest must be at least 0\n")
         error.pack()
-        ok = Button(root, text="Ok", command=lambda: dcClicked("Custom", root))
+        ok = Button(root, text="Ok", command=lambda: dcClicked("Custom"))
         ok.pack()
         badInput = True
     if badInput != True:
         #badInput is set to true if the input is bad. If it's good, it allows them to click start to go to play()
         beginspace1 = Label(root, text="")
         beginspace1.pack()
-        begin1 = Button(root, text="Start", width=15, height=5, command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, he, badTurn))
+        begin1 = Button(root, text="Start", width=15, height=5, command=play)
         begin1.pack()
         global turnNumber
         turnNumber = 0
@@ -172,7 +185,16 @@ def customconfirmClick(root, t, h, m, hr, hc, he):
         badTurn = False
 
 #Play the game
-def play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn):
+def play():
+    global houseEntry
+    global root
+    global turns
+    global houses
+    global money
+    global houseRevenue
+    global houseCost
+    global turnNumber
+    global badTurn
     if turnNumber != 0:
         try:
             newHouses = int(houseEntry.get())
@@ -214,14 +236,22 @@ def play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseE
         houseEntry.focus_set()
         houseEntry.pack()
         if turnNumber != turns:
-            purchase = Button(root, text="Buy Houses", command=lambda: play(root, turnNumber, turns, money, houses, houseCost, houseRevenue, houseEntry, badTurn))
+            purchase = Button(root, text="Buy Houses", command=play)
             purchase.pack()
         else:
-            lastPurchase = Button(root, text="Buy Houses\nand Finish", command=lambda: endGame(root, turns, money, houses, houseEntry, houseCost, houseRevenue, badTurn))
+            lastPurchase = Button(root, text="Buy Houses\nand Finish", command=endGame)
             lastPurchase.pack()
 
 #Shows results and asks to play again
-def endGame(root, turns, money, houses, houseEntry, houseCost, houseRevenue, badTurn):
+def endGame():
+    global root
+    global houseEntry
+    global turns
+    global money
+    global houses
+    global houseCost
+    global houseRevenue
+    global badTurn
     try:
         newHouses = int(houseEntry.get())
         price = newHouses*houseCost
@@ -254,17 +284,18 @@ def endGame(root, turns, money, houses, houseEntry, houseCost, houseRevenue, bad
         results = Label(root, text="\nYou've Completed The Game\nYou ended with " + str(money) + " dollars!\nYou also had " + str(houses) + " houses\n")
         results.pack()
         #First button goes to createGame(), other button goes to end()
-        again = Button(root, text="Play Again", width=8, command=lambda: createGame(root))
+        again = Button(root, text="Play Again", width=8, command=createGame)
         again.pack()
-        quit = Button(root, text="Quit", width=7, command= root.quit)
+        quit = Button(root, text="Quit", width=7, command=root.quit)
         quit.pack()
 
 #Makes window
+global root
 root = Tk()
 root.title("House Game")
 root.resizable(width=False, height=False)
 root.geometry("530x220")
 
-createGame(root)
+createGame()
 
 root.mainloop()
